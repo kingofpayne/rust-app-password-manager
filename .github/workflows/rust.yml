@@ -26,6 +26,7 @@ jobs:
           override: true
           target: thumbv6m-none-eabi
       - run: arm-none-eabi-gcc -print-sysroot
+      - run: cat /usr/include/stdint.h
       - name: Cargo build
         uses: actions-rs/cargo@v1
         with:
