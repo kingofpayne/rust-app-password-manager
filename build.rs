@@ -23,13 +23,18 @@ fn main() {
         .arg("-print-sysroot")
         .output()
         .expect("failed");
+    let sysroot = std::str::from_utf8(&output.stdout).unwrap().trim();
     println!("DEBUG sysroot {:#?}", output);
+
+    let mut x = String::from("--sysroot=");
+    x.push_str(sysroot);
 
     let bindings = bindgen::Builder::default()
         .header("./src/c/aes.h")
         .layout_tests(false)
         .use_core()
         .ctypes_prefix("cty")
+        .clang_arg(x)
         .generate()
         .expect("Unable to generate bindings");
     bindings
@@ -38,7 +43,6 @@ fn main() {
         )
         .expect("Could'nt write bindings");
 
-    let sysroot = std::str::from_utf8(&output.stdout).unwrap().trim();
     let gcc_toolchain = if sysroot.is_empty() {
         String::from("/usr/include/")
     } else {
