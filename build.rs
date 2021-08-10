@@ -19,6 +19,12 @@ use std::path::PathBuf;
 use std::process::Command;
 
 fn main() {
+    let output = Command::new("arm-none-eabi-gcc")
+        .arg("-print-sysroot")
+        .output()
+        .expect("failed");
+    println!("DEBUG sysroot {:#?}", output);
+
     let bindings = bindgen::Builder::default()
         .header("./src/c/aes.h")
         .layout_tests(false)
@@ -31,11 +37,6 @@ fn main() {
             PathBuf::from(env::var("OUT_DIR").unwrap()).join("bindings.rs"),
         )
         .expect("Could'nt write bindings");
-
-    let output = Command::new("arm-none-eabi-gcc")
-        .arg("-print-sysroot")
-        .output()
-        .expect("failed");
 
     let sysroot = std::str::from_utf8(&output.stdout).unwrap().trim();
     let gcc_toolchain = if sysroot.is_empty() {
